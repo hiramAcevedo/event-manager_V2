@@ -1,27 +1,60 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Plus, Calendar } from 'lucide-react'
+import { Plus, CalendarDays, Sparkles, Sun, Moon } from 'lucide-react'
 
 export default function Header() {
+    const [theme, setTheme] = useState<'dark' | 'light'>('dark')
+
+    useEffect(() => {
+        // Leer tema guardado
+        const savedTheme = localStorage.getItem('event-manager-theme') as 'dark' | 'light' | null
+        if (savedTheme) {
+            setTheme(savedTheme)
+            document.documentElement.setAttribute('data-theme', savedTheme)
+        }
+    }, [])
+
+    const toggleTheme = () => {
+        const newTheme = theme === 'dark' ? 'light' : 'dark'
+        setTheme(newTheme)
+        localStorage.setItem('event-manager-theme', newTheme)
+        document.documentElement.setAttribute('data-theme', newTheme)
+    }
+
     return (
-        <header className="text-white shadow-md py-4" style={{ backgroundColor: '#1a252f' }}>
-            <div className="container mx-auto px-4 flex justify-between items-center">
+        <header className="header">
+            <div className="header-container">
                 <div>
-                    <h1 className="text-xl font-bold leading-tight">Sistema de Gestión de Eventos</h1>
-                    <p className="text-xs text-gray-400">Gestión y Organización de Eventos</p>
+                    <Link href="/events" className="header-title" style={{ textDecoration: 'none' }}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <Sparkles size={24} />
+                            EventManager
+                        </span>
+                    </Link>
+                    <p className="header-subtitle">Gestión y Organización de Eventos</p>
                 </div>
-                <nav className="flex items-center gap-3">
+                <nav className="header-nav">
+                    <button
+                        onClick={toggleTheme}
+                        className="theme-toggle"
+                        title={theme === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'}
+                    >
+                        {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                    </button>
                     <Link
                         href="/events"
-                        className="flex items-center gap-2 px-4 py-2 rounded-md transition-colors text-sm font-medium text-white hover:brightness-110"
-                        style={{ backgroundColor: '#e74c3c' }}
+                        className="btn-ghost"
+                        style={{ textDecoration: 'none' }}
                     >
-                        <Calendar size={18} />
-                        <span>Lista</span>
+                        <CalendarDays size={18} />
+                        <span>Mis Eventos</span>
                     </Link>
                     <Link
                         href="/events/new"
-                        className="flex items-center gap-2 px-4 py-2 rounded-md transition-colors text-sm font-medium text-white hover:bg-[#ffffff33]"
-                        style={{ backgroundColor: '#ffffff1a' }}
+                        className="btn-primary"
+                        style={{ textDecoration: 'none' }}
                     >
                         <Plus size={18} />
                         <span>Nuevo</span>

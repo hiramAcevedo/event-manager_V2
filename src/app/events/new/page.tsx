@@ -1,8 +1,10 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import EventForm from '@/components/EventForm'
 import { EventFormData } from '@/types'
+import { ArrowLeft, CalendarPlus } from 'lucide-react'
 
 export default function NewEventPage() {
     const router = useRouter()
@@ -29,8 +31,23 @@ export default function NewEventPage() {
     }
 
     return (
-        <div className="fade-in" style={{ maxWidth: '800px', margin: '0 auto' }}>
-            <h1>Crear Nuevo Evento</h1>
+        <div className="fade-in" style={{ maxWidth: '900px', margin: '0 auto' }}>
+            <Link 
+                href="/events" 
+                style={{ 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    gap: '0.5rem',
+                    color: 'var(--text-muted)',
+                    fontSize: '0.9rem',
+                    textDecoration: 'none',
+                    marginBottom: '1rem',
+                }}
+            >
+                <ArrowLeft size={16} />
+                Volver a eventos
+            </Link>
+            
             <EventForm
                 onSubmit={handleSubmit}
                 onCancel={() => router.back()}

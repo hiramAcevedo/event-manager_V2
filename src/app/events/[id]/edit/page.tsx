@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import EventForm from '@/components/EventForm'
 import { Event, EventFormData } from '@/types'
+import { ArrowLeft } from 'lucide-react'
 
 export default function EditEventPage({ params }: { params: Promise<{ id: string }> }) {
     const router = useRouter()
@@ -53,12 +55,34 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
         router.refresh()
     }
 
-    if (loading) return <div className="text-center py-10">Cargando...</div>
+    if (loading) {
+        return (
+            <div className="loading" style={{ minHeight: '50vh' }}>
+                Cargando evento...
+            </div>
+        )
+    }
+
     if (!event) return null
 
     return (
-        <div className="max-w-2xl mx-auto">
-            <h1 className="text-2xl font-bold text-gray-800 mb-6">Editar Evento</h1>
+        <div className="fade-in" style={{ maxWidth: '900px', margin: '0 auto' }}>
+            <Link 
+                href={`/events/${eventId}`}
+                style={{ 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    gap: '0.5rem',
+                    color: 'var(--text-muted)',
+                    fontSize: '0.9rem',
+                    textDecoration: 'none',
+                    marginBottom: '1rem',
+                }}
+            >
+                <ArrowLeft size={16} />
+                Volver al evento
+            </Link>
+
             <EventForm
                 event={event}
                 onSubmit={handleSubmit}

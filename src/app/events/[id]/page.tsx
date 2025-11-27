@@ -7,6 +7,7 @@ import { EventWithGuests } from '@/types'
 import Badge from '@/components/Badge'
 import DeleteButton from '@/components/DeleteButton'
 import GuestTable from '@/components/GuestTable'
+import { Calendar, MapPin, User, Users, ArrowLeft, Pencil, Monitor, Gift } from 'lucide-react'
 
 export default function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const router = useRouter()
@@ -53,7 +54,14 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
         }
     }
 
-    if (loading) return <div className="text-center py-10">Cargando...</div>
+    if (loading) {
+        return (
+            <div className="loading" style={{ minHeight: '50vh' }}>
+                Cargando evento...
+            </div>
+        )
+    }
+
     if (!event) return null
 
     const confirmedGuests = event.guests.filter(g => g.confirmed).length
@@ -63,94 +71,192 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
         : 0
 
     return (
-        <div className="space-y-8">
+        <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {/* Navegación */}
+            <Link 
+                href="/events" 
+                style={{ 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    gap: '0.5rem',
+                    color: 'var(--text-muted)',
+                    fontSize: '0.9rem',
+                    textDecoration: 'none',
+                }}
+            >
+                <ArrowLeft size={16} />
+                Volver a eventos
+            </Link>
+
             {/* Header del Evento */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
-                    <div>
-                        <div className="flex gap-2 mb-2">
+            <div className="card">
+                <div style={{ 
+                    display: 'flex', 
+                    flexWrap: 'wrap',
+                    justifyContent: 'space-between', 
+                    alignItems: 'flex-start',
+                    gap: '1rem', 
+                    marginBottom: '1.5rem' 
+                }}>
+                    <div style={{ flex: 1, minWidth: '250px' }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.75rem' }}>
                             <Badge variant="info">{event.eventType}</Badge>
                             {event.isVirtual && <Badge variant="info">Virtual</Badge>}
                             {event.isSurprise && <Badge variant="warning">Sorpresa</Badge>}
                         </div>
-                        <h1 className="text-3xl font-bold text-gray-800 mb-2">{event.title}</h1>
-                        <p className="text-gray-600">{event.description}</p>
+                        <h1 style={{ margin: 0, marginBottom: '0.5rem', fontSize: '1.75rem' }}>
+                            {event.title}
+                        </h1>
+                        {event.description && (
+                            <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                                {event.description}
+                            </p>
+                        )}
                     </div>
-                    <div className="flex items-start gap-3">
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
                         <Link
                             href={`/events/${event.id}/edit`}
-                            className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-md font-medium text-sm transition-colors"
+                            className="btn-ghost"
+                            style={{ textDecoration: 'none' }}
                         >
+                            <Pencil size={16} />
                             Editar
                         </Link>
                         <DeleteButton
                             onConfirm={handleDelete}
                             itemName="evento"
-                            className="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-md font-medium text-sm transition-colors"
                         />
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-gray-100">
-                    <div className="flex items-center gap-3">
-                        <span className="text-2xl">📅</span>
+                {/* Info del evento */}
+                <div style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+                    gap: '1.5rem',
+                    padding: '1.5rem 0',
+                    borderTop: '1px solid var(--border-primary)',
+                    borderBottom: '1px solid var(--border-primary)',
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <div style={{ 
+                            padding: '0.75rem', 
+                            background: 'rgba(99, 102, 241, 0.1)', 
+                            borderRadius: 'var(--radius-md)',
+                            color: 'var(--accent-primary)',
+                        }}>
+                            <Calendar size={24} />
+                        </div>
                         <div>
-                            <p className="text-sm text-gray-500">Fecha</p>
-                            <p className="font-medium">
+                            <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                Fecha
+                            </p>
+                            <p style={{ margin: 0, fontWeight: 600, color: 'var(--text-primary)' }}>
                                 {new Date(event.date).toLocaleDateString('es-MX', {
                                     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
                                 })}
                             </p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                        <span className="text-2xl">📍</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <div style={{ 
+                            padding: '0.75rem', 
+                            background: 'rgba(16, 185, 129, 0.1)', 
+                            borderRadius: 'var(--radius-md)',
+                            color: 'var(--accent-secondary)',
+                        }}>
+                            <MapPin size={24} />
+                        </div>
                         <div>
-                            <p className="text-sm text-gray-500">Ubicación</p>
-                            <p className="font-medium">{event.location}</p>
+                            <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                Ubicación
+                            </p>
+                            <p style={{ margin: 0, fontWeight: 600, color: 'var(--text-primary)' }}>
+                                {event.location}
+                            </p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                        <span className="text-2xl">👤</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <div style={{ 
+                            padding: '0.75rem', 
+                            background: 'rgba(245, 158, 11, 0.1)', 
+                            borderRadius: 'var(--radius-md)',
+                            color: 'var(--accent-warning)',
+                        }}>
+                            <User size={24} />
+                        </div>
                         <div>
-                            <p className="text-sm text-gray-500">Organizador</p>
-                            <p className="font-medium">{event.organizer}</p>
+                            <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                Organizador
+                            </p>
+                            <p style={{ margin: 0, fontWeight: 600, color: 'var(--text-primary)' }}>
+                                {event.organizer}
+                            </p>
                         </div>
                     </div>
                 </div>
 
+                {/* Barra de capacidad */}
                 {event.maxAttendees > 0 && (
-                    <div className="mt-6">
-                        <div className="flex justify-between text-sm mb-1">
-                            <span className="text-gray-600">Capacidad: {totalPeople} / {event.maxAttendees} personas</span>
-                            <span className="font-medium text-blue-600">{capacityPercentage}%</span>
+                    <div style={{ marginTop: '1.5rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                            <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                                Capacidad: {totalPeople} / {event.maxAttendees} personas
+                            </span>
+                            <span style={{ 
+                                fontSize: '0.9rem', 
+                                fontWeight: 600, 
+                                color: capacityPercentage > 90 ? 'var(--accent-danger)' : 'var(--accent-primary)' 
+                            }}>
+                                {capacityPercentage}%
+                            </span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2.5">
-                            <div
-                                className={`h-2.5 rounded-full ${capacityPercentage > 90 ? 'bg-red-500' : 'bg-blue-600'}`}
+                        <div className="progress-bar">
+                            <div 
+                                className={`progress-bar-fill ${capacityPercentage > 90 ? 'danger' : ''}`}
                                 style={{ width: `${capacityPercentage}%` }}
-                            ></div>
+                            />
                         </div>
                     </div>
                 )}
             </div>
 
             {/* Sección de Invitados */}
-            <div className="space-y-4">
-                <h2 className="text-xl font-bold text-gray-800">Lista de Invitados</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <h2 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Users size={24} style={{ color: 'var(--accent-primary)' }} />
+                    Lista de Invitados
+                </h2>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <p className="text-sm text-gray-500">Total Invitaciones</p>
-                        <p className="text-2xl font-bold text-gray-800">{event.guests.length}</p>
+                {/* Stats de invitados */}
+                <div style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
+                    gap: '1rem' 
+                }}>
+                    <div className="card" style={{ padding: '1rem', textAlign: 'center' }}>
+                        <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                            Invitaciones
+                        </p>
+                        <p style={{ margin: 0, fontSize: '2rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                            {event.guests.length}
+                        </p>
                     </div>
-                    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <p className="text-sm text-gray-500">Confirmados</p>
-                        <p className="text-2xl font-bold text-green-600">{confirmedGuests}</p>
+                    <div className="card" style={{ padding: '1rem', textAlign: 'center' }}>
+                        <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                            Confirmados
+                        </p>
+                        <p style={{ margin: 0, fontSize: '2rem', fontWeight: 700, color: 'var(--accent-secondary)' }}>
+                            {confirmedGuests}
+                        </p>
                     </div>
-                    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <p className="text-sm text-gray-500">Total Personas</p>
-                        <p className="text-2xl font-bold text-blue-600">{totalPeople}</p>
+                    <div className="card" style={{ padding: '1rem', textAlign: 'center' }}>
+                        <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                            Total Personas
+                        </p>
+                        <p style={{ margin: 0, fontSize: '2rem', fontWeight: 700, color: 'var(--accent-primary)' }}>
+                            {totalPeople}
+                        </p>
                     </div>
                 </div>
 
@@ -159,12 +265,6 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                     eventId={event.id}
                     onUpdate={fetchEvent}
                 />
-            </div>
-
-            <div className="pt-4">
-                <Link href="/events" className="text-gray-500 hover:text-gray-700 text-sm font-medium flex items-center gap-1">
-                    ← Volver a la lista
-                </Link>
             </div>
         </div>
     )

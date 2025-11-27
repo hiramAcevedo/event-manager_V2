@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Trash2 } from 'lucide-react'
+import { Trash2, X, Check } from 'lucide-react'
 
 interface DeleteButtonProps {
     onConfirm: () => Promise<void>;
@@ -22,21 +22,48 @@ export default function DeleteButton({ onConfirm, itemName, className = '', icon
 
     if (isConfirming) {
         return (
-            <div className="flex items-center gap-2 bg-red-50 px-2 py-1 rounded-md animate-fade-in">
-                <span className="text-xs text-red-600 font-medium">¿Seguro?</span>
+            <div 
+                className="fade-in"
+                style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.4rem 0.75rem',
+                    background: 'rgba(239, 68, 68, 0.15)',
+                    border: '1px solid rgba(239, 68, 68, 0.3)',
+                    borderRadius: 'var(--radius-md)',
+                }}
+            >
+                <span style={{ fontSize: '0.8rem', color: '#f87171', fontWeight: 600 }}>
+                    ¿Eliminar?
+                </span>
                 <button
                     onClick={handleDelete}
                     disabled={isDeleting}
-                    className="text-red-700 hover:text-red-900 text-xs font-bold disabled:opacity-50"
+                    style={{
+                        padding: '0.25rem',
+                        background: 'rgba(239, 68, 68, 0.2)',
+                        borderRadius: '4px',
+                        color: '#f87171',
+                        minWidth: 'auto',
+                    }}
+                    title="Confirmar"
                 >
-                    {isDeleting ? '...' : 'Sí'}
+                    {isDeleting ? '...' : <Check size={14} />}
                 </button>
                 <button
                     onClick={() => setIsConfirming(false)}
                     disabled={isDeleting}
-                    className="text-gray-500 hover:text-gray-700 text-xs disabled:opacity-50"
+                    style={{
+                        padding: '0.25rem',
+                        background: 'var(--bg-tertiary)',
+                        borderRadius: '4px',
+                        color: 'var(--text-muted)',
+                        minWidth: 'auto',
+                    }}
+                    title="Cancelar"
                 >
-                    No
+                    <X size={14} />
                 </button>
             </div>
         )
@@ -45,11 +72,21 @@ export default function DeleteButton({ onConfirm, itemName, className = '', icon
     return (
         <button
             onClick={() => setIsConfirming(true)}
-            className={`p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors ${className}`}
+            className={className}
+            style={{
+                padding: iconOnly ? '0.5rem' : '0.5rem 0.75rem',
+                background: 'rgba(239, 68, 68, 0.1)',
+                color: '#f87171',
+                border: '1px solid rgba(239, 68, 68, 0.2)',
+                borderRadius: 'var(--radius-md)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+            }}
             title={`Eliminar ${itemName}`}
         >
-            <Trash2 size={18} />
-            {!iconOnly && <span className="ml-2">Eliminar</span>}
+            <Trash2 size={16} />
+            {!iconOnly && <span>Eliminar</span>}
         </button>
     )
 }

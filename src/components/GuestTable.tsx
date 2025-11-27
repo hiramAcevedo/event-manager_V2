@@ -5,6 +5,7 @@ import { Guest } from '@/types'
 import Badge from './Badge'
 import DeleteButton from './DeleteButton'
 import GuestForm from './GuestForm'
+import { Search, UserPlus, Pencil, Filter } from 'lucide-react'
 
 interface GuestTableProps {
     guests: Guest[];
@@ -39,79 +40,149 @@ export default function GuestTable({ guests, eventId, onUpdate }: GuestTableProp
     })
 
     return (
-        <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row justify-between gap-4">
-                <div className="relative flex-1">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {/* Controles de filtro */}
+            <div style={{ 
+                display: 'flex', 
+                flexWrap: 'wrap',
+                gap: '0.75rem',
+                alignItems: 'center',
+            }}>
+                {/* Búsqueda */}
+                <div style={{ position: 'relative', flex: '1 1 250px', minWidth: '200px' }}>
+                    <Search 
+                        size={18} 
+                        style={{ 
+                            position: 'absolute', 
+                            left: '0.875rem', 
+                            top: '50%', 
+                            transform: 'translateY(-50%)', 
+                            color: 'var(--text-muted)' 
+                        }} 
+                    />
                     <input
                         type="text"
                         placeholder="Buscar invitado..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        style={{ 
+                            width: '100%',
+                            paddingLeft: '2.75rem',
+                        }}
                     />
                 </div>
-                <select
-                    value={filter}
-                    onChange={(e) => setFilter(e.target.value as any)}
-                    className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                    <option value="all">Todos</option>
-                    <option value="confirmed">Confirmados</option>
-                    <option value="pending">Pendientes</option>
-                </select>
+
+                {/* Filtro */}
+                <div style={{ position: 'relative' }}>
+                    <Filter 
+                        size={16} 
+                        style={{ 
+                            position: 'absolute', 
+                            left: '0.875rem', 
+                            top: '50%', 
+                            transform: 'translateY(-50%)', 
+                            color: 'var(--text-muted)',
+                            pointerEvents: 'none',
+                        }} 
+                    />
+                    <select
+                        value={filter}
+                        onChange={(e) => setFilter(e.target.value as any)}
+                        style={{ 
+                            paddingLeft: '2.5rem',
+                            minWidth: '150px',
+                        }}
+                    >
+                        <option value="all">Todos</option>
+                        <option value="confirmed">Confirmados</option>
+                        <option value="pending">Pendientes</option>
+                    </select>
+                </div>
+
+                {/* Botón añadir */}
                 <button
                     onClick={() => { setEditingGuest(undefined); setIsModalOpen(true) }}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium text-sm whitespace-nowrap"
+                    className="btn-primary"
+                    style={{ whiteSpace: 'nowrap' }}
                 >
-                    + Añadir Invitado
+                    <UserPlus size={18} />
+                    Añadir Invitado
                 </button>
             </div>
 
-            <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                        <thead className="bg-gray-50 text-gray-700 font-medium border-b border-gray-200">
+            {/* Tabla de invitados */}
+            <div className="table-container">
+                <div className="table-scroll">
+                    <table style={{ minWidth: '600px' }}>
+                        <thead>
                             <tr>
-                                <th className="px-6 py-3">Nombre</th>
-                                <th className="px-6 py-3">Origen</th>
-                                <th className="px-6 py-3">Acompañantes</th>
-                                <th className="px-6 py-3">Estado</th>
-                                <th className="px-6 py-3 text-right">Acciones</th>
+                                <th>Invitado</th>
+                                <th>Origen</th>
+                                <th>Acompañantes</th>
+                                <th>Estado</th>
+                                <th style={{ textAlign: 'right' }}>Acciones</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-200">
+                        <tbody>
                             {filteredGuests.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
-                                        No se encontraron invitados
+                                    <td colSpan={5} style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                                        {search || filter !== 'all' 
+                                            ? 'No se encontraron invitados con esos criterios'
+                                            : 'No hay invitados registrados'}
                                     </td>
                                 </tr>
                             ) : (
                                 filteredGuests.map(guest => (
-                                    <tr key={guest.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 font-medium text-gray-900">
-                                            {guest.name}
-                                            {guest.relationship && <span className="block text-xs text-gray-500 font-normal">{guest.relationship}</span>}
+                                    <tr key={guest.id}>
+                                        <td>
+                                            <div>
+                                                <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
+                                                    {guest.name}
+                                                </span>
+                                                {guest.relationship && (
+                                                    <span style={{ 
+                                                        display: 'block', 
+                                                        fontSize: '0.8rem', 
+                                                        color: 'var(--text-muted)' 
+                                                    }}>
+                                                        {guest.relationship}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </td>
-                                        <td className="px-6 py-4 text-gray-600">{guest.origin || '-'}</td>
-                                        <td className="px-6 py-4 text-gray-600">{guest.companions}</td>
-                                        <td className="px-6 py-4">
-                                            <Badge variant={guest.confirmed ? 'success' : 'default'}>
-                                                {guest.confirmed ? 'Confirmado' : 'Pendiente'}
+                                        <td>{guest.origin || '—'}</td>
+                                        <td>
+                                            <Badge variant={guest.companions > 0 ? 'info' : 'default'}>
+                                                +{guest.companions}
                                             </Badge>
                                         </td>
-                                        <td className="px-6 py-4 text-right space-x-3">
-                                            <button
-                                                onClick={() => { setEditingGuest(guest); setIsModalOpen(true) }}
-                                                className="text-blue-600 hover:text-blue-800 font-medium"
-                                            >
-                                                ✏️
-                                            </button>
-                                            <DeleteButton
-                                                onConfirm={() => handleDelete(guest.id)}
-                                                itemName="invitado"
-                                            />
+                                        <td>
+                                            <Badge variant={guest.confirmed ? 'success' : 'warning'}>
+                                                {guest.confirmed ? '✓ Confirmado' : '⏳ Pendiente'}
+                                            </Badge>
+                                        </td>
+                                        <td>
+                                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+                                                <button
+                                                    onClick={() => { setEditingGuest(guest); setIsModalOpen(true) }}
+                                                    style={{
+                                                        padding: '0.5rem',
+                                                        background: 'rgba(99, 102, 241, 0.1)',
+                                                        color: 'var(--accent-primary)',
+                                                        borderRadius: 'var(--radius-sm)',
+                                                        border: '1px solid rgba(99, 102, 241, 0.2)',
+                                                    }}
+                                                    title="Editar invitado"
+                                                >
+                                                    <Pencil size={16} />
+                                                </button>
+                                                <DeleteButton
+                                                    onConfirm={() => handleDelete(guest.id)}
+                                                    itemName="invitado"
+                                                    iconOnly
+                                                />
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
