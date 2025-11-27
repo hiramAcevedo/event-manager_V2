@@ -1,0 +1,61 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Tipos de evento como enum
+enum EventType {
+  BODA
+  CUMPLEANOS
+  XV_ANOS
+  CORPORATIVO
+  CONFERENCIA
+  BAUTIZO
+  ANIVERSARIO
+  GRADUACION
+  BABY_SHOWER
+  OTRO
+}
+
+// Modelo principal: Evento
+model Event {
+  id              Int       @id @default(autoincrement())
+  title           String
+  description     String?
+  date            DateTime
+  location        String
+  organizer       String
+  eventType       EventType @default(OTRO)
+  maxAttendees    Int       @default(0)
+  currentAttendees Int      @default(0)
+  isVirtual       Boolean   @default(false)
+  isSurprise      Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relación con invitados
+  guests          Guest[]
+}
+
+// Modelo: Invitado
+model Guest {
+  id           Int      @id @default(autoincrement())
+  name         String
+  origin       String?
+  companions   Int      @default(0)
+  confirmed    Boolean  @default(false)
+  relationship String?
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relación con evento
+  event        Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId      Int
+}
