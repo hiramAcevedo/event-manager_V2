@@ -1,20 +1,24 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { Plus, CalendarDays, Sparkles, Sun, Moon } from 'lucide-react'
 
+function getInitialTheme(): 'dark' | 'light' {
+    if (typeof window === 'undefined') return 'dark'
+    return (localStorage.getItem('event-manager-theme') as 'dark' | 'light') || 'dark'
+}
+
 export default function Header() {
-    const [theme, setTheme] = useState<'dark' | 'light'>('dark')
+    const [theme, setTheme] = useState<'dark' | 'light'>(getInitialTheme)
+    const isFirstRender = useRef(true)
 
     useEffect(() => {
-        // Leer tema guardado
-        const savedTheme = localStorage.getItem('event-manager-theme') as 'dark' | 'light' | null
-        if (savedTheme) {
-            setTheme(savedTheme)
-            document.documentElement.setAttribute('data-theme', savedTheme)
+        if (isFirstRender.current) {
+            isFirstRender.current = false
+            document.documentElement.setAttribute('data-theme', theme)
         }
-    }, [])
+    }, [theme])
 
     const toggleTheme = () => {
         const newTheme = theme === 'dark' ? 'light' : 'dark'

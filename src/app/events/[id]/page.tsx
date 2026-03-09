@@ -1,13 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { EventWithGuests } from '@/types'
 import Badge from '@/components/Badge'
 import DeleteButton from '@/components/DeleteButton'
 import GuestTable from '@/components/GuestTable'
-import { Calendar, MapPin, User, Users, ArrowLeft, Pencil, Monitor, Gift } from 'lucide-react'
+import { Calendar, MapPin, User, Users, ArrowLeft, Pencil } from 'lucide-react'
 
 export default function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const router = useRouter()
@@ -23,7 +23,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
         unwrapParams()
     }, [params])
 
-    const fetchEvent = async () => {
+    const fetchEvent = useCallback(async () => {
         if (!eventId) return
         try {
             const res = await fetch(`/api/events/${eventId}`)
@@ -38,11 +38,11 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
         } finally {
             setLoading(false)
         }
-    }
+    }, [eventId, router])
 
     useEffect(() => {
         fetchEvent()
-    }, [eventId])
+    }, [fetchEvent])
 
     const handleDelete = async () => {
         if (!eventId) return

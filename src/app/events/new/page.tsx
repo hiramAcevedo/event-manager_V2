@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import EventForm from '@/components/EventForm'
 import { EventFormData } from '@/types'
-import { ArrowLeft, CalendarPlus } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 
 export default function NewEventPage() {
     const router = useRouter()

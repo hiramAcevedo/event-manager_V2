@@ -1,20 +1,20 @@
 import { prisma } from '@/lib/prisma'
+import { updateEventSchema, idParamSchema } from '@/lib/validations'
 import { NextResponse } from 'next/server'
 
-// GET - Obtener evento por ID
 export async function GET(
     request: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const { id: idString } = await params
-        const id = parseInt(idString)
-        if (isNaN(id)) {
+        const result = idParamSchema.safeParse(idString)
+        if (!result.success) {
             return NextResponse.json({ error: 'ID inválido' }, { status: 400 })
         }
 
         const event = await prisma.event.findUnique({
-            where: { id },
+            where: { id: result.data },
             include: { guests: true }
         })
 
@@ -26,7 +26,7 @@ export async function GET(
         }
 
         return NextResponse.json(event)
-    } catch (error) {
+    } catch {
         return NextResponse.json(
             { error: 'Error al obtener evento' },
             { status: 500 }
@@ -34,31 +34,35 @@ export async function GET(
     }
 }
 
-// PUT - Actualizar evento
 export async function PUT(
     request: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const { id: idString } = await params
-        const id = parseInt(idString)
+        const idResult = idParamSchema.safeParse(idString)
+        if (!idResult.success) {
+            return NextResponse.json({ error: 'ID inválido' }, { status: 400 })
+        }
+
         const body = await request.json()
+        const parsed = updateEventSchema.safeParse(body)
+        if (!parsed.success) {
+            return NextResponse.json(
+                { error: 'Datos inválidos', issues: parsed.error.flatten().fieldErrors },
+                { status: 400 }
+            )
+        }
+
         const event = await prisma.event.update({
-            where: { id },
+            where: { id: idResult.data },
             data: {
-                title: body.title,
-                description: body.description,
-                date: new Date(body.date),
-                location: body.location,
-                organizer: body.organizer,
-                eventType: body.eventType,
-                maxAttendees: parseInt(String(body.maxAttendees)) || 0,
-                isVirtual: body.isVirtual,
-                isSurprise: body.isSurprise,
+                ...parsed.data,
+                date: new Date(parsed.data.date),
             }
         })
         return NextResponse.json(event)
-    } catch (error) {
+    } catch {
         return NextResponse.json(
             { error: 'Error al actualizar evento' },
             { status: 500 }
@@ -66,19 +70,22 @@ export async function PUT(
     }
 }
 
-// DELETE - Eliminar evento
 export async function DELETE(
     request: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const { id: idString } = await params
-        const id = parseInt(idString)
+        const result = idParamSchema.safeParse(idString)
+        if (!result.success) {
+            return NextResponse.json({ error: 'ID inválido' }, { status: 400 })
+        }
+
         await prisma.event.delete({
-            where: { id }
+            where: { id: result.data }
         })
         return NextResponse.json({ message: 'Evento eliminado' })
-    } catch (error) {
+    } catch {
         return NextResponse.json(
             { error: 'Error al eliminar evento' },
             { status: 500 }

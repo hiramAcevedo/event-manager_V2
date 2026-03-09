@@ -104,9 +104,14 @@ npm install
 
 3. **Configurar variables de entorno**
 
-Crear archivo `.env` en la raíz:
+Copiar `.env.example` a `.env` y configurar las credenciales de Supabase:
+```bash
+cp .env.example .env
+```
+
 ```env
-DATABASE_URL="postgresql://usuario:contraseña@localhost:5432/eventmanager?schema=public"
+DATABASE_URL="postgresql://postgres.[REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true"
+DIRECT_URL="postgresql://postgres.[REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres"
 ```
 
 4. **Ejecutar migraciones**
@@ -124,58 +129,29 @@ npm run dev
 http://localhost:3000
 ```
 
-## 🌐 Despliegue en Railway
+## 🌐 Despliegue en Vercel + Supabase
 
-### Opción 1: Desde GitHub (Recomendado)
+### 1. Configurar Supabase (Base de datos)
 
-1. **Subir a GitHub**
-```bash
-git init
-git add .
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin <tu-repositorio>
-git push -u origin main
-```
+1. Crear un proyecto en [database.new](https://database.new)
+2. Ir a **Project Settings > Database**
+3. Copiar las connection strings:
+   - **Transaction pooler** (puerto 6543) para `DATABASE_URL`
+   - **Session pooler** (puerto 5432) para `DIRECT_URL`
 
-2. **En Railway**
-   - Ir a [railway.app](https://railway.app)
-   - Click en "New Project"
-   - Seleccionar "Deploy from GitHub repo"
-   - Elegir tu repositorio
+### 2. Desplegar en Vercel
 
-3. **Agregar PostgreSQL**
-   - Click en "New" → "Database" → "PostgreSQL"
-   - Railway configurará automáticamente `DATABASE_URL`
+1. Importar el repositorio en [vercel.com/new](https://vercel.com/new)
+2. Configurar las variables de entorno:
+   - `DATABASE_URL` con la connection string de transaction pooler + `?pgbouncer=true`
+   - `DIRECT_URL` con la connection string de session pooler
+3. Vercel ejecutara automaticamente `prisma generate && next build`
 
-4. **Configurar variables de entorno** (si es necesario)
-   - En el servicio de tu app, ir a "Variables"
-   - Railway debería auto-configurar `DATABASE_URL`
-
-5. **Ejecutar migraciones** (primera vez)
-   - En Railway, ir a tu servicio
-   - Abrir la terminal o usar Railway CLI:
-   ```bash
-   railway run npx prisma migrate deploy
-   ```
-
-### Opción 2: Railway CLI
+### 3. Ejecutar migraciones
 
 ```bash
-# Instalar CLI
-npm install -g @railway/cli
-
-# Login
-railway login
-
-# Inicializar proyecto
-railway init
-
-# Agregar PostgreSQL
-railway add
-
-# Desplegar
-railway up
+# Con las variables de entorno de Supabase en tu .env local
+npx prisma migrate deploy
 ```
 
 ## 📊 Modelo de Datos

@@ -1,11 +1,11 @@
 import Link from 'next/link'
-import { Event } from '@/types'
+import { Event, Guest } from '@/types'
 import Badge from './Badge'
 import DeleteButton from './DeleteButton'
 import { Calendar, MapPin, Pencil, ArrowRight, User } from 'lucide-react'
 
 interface EventCardProps {
-    event: Event & { guests?: any[] };
+    event: Event & { guests?: Guest[] };
     onDelete: (id: number) => Promise<void>;
 }
 

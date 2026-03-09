@@ -87,7 +87,7 @@ export default function GuestTable({ guests, eventId, onUpdate }: GuestTableProp
                     />
                     <select
                         value={filter}
-                        onChange={(e) => setFilter(e.target.value as any)}
+                        onChange={(e) => setFilter(e.target.value as 'all' | 'confirmed' | 'pending')}
                         style={{ 
                             paddingLeft: '2.5rem',
                             minWidth: '150px',
