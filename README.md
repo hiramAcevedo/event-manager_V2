@@ -9,6 +9,8 @@ Sistema web moderno para la gestión integral de eventos y sus invitados. Desarr
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?logo=postgresql)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-06B6D4?logo=tailwindcss)
 
+![EventManager UI](./event-manager.png)
+
 ## 📋 Descripción
 
 EventManager es una aplicación CRUD completa que permite:
